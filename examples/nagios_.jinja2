@@ -8,11 +8,18 @@ define {{object_name}} {
     {{object_name}}_name {{resource.name}}
     {% endif %}
     {% for key,value in resource.parameters.items() %}
+    {% set name_key = (object_name ~ '_' ~ key)|upper %}
     {% if key not in metaparams or key in allowed_metaparams %}
     {% if value is iterable and value is not string %}
     {{key}} {{value|join(", ")}}
     {% else %}
+    {% if name_key in env %}
+    {{key}} {{env[name_key]}}
+    {% elif key|upper in env %}
+    {{key}} {{env[key|upper]}}
+    {% else %}
     {{key}} {{value}}
+    {% endif %}
     {% endif %}
     {% endif %}
     {% endfor %}

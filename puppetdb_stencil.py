@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 
 import argparse
 import logging
+import os
 import pypuppetdb
 import jinja2
 
@@ -36,7 +37,8 @@ def render_resources(database, resource_type, template_names):
         LOG.error('No template found for {0}'.format(resource_type))
     else:
         return template.render(resource_type=resource_type,
-                               resources=resources, metaparams=METAPARAMS)
+                               resources=resources, metaparams=METAPARAMS,
+                               env=os.environ)
 
 
 def main():
