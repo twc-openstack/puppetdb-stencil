@@ -4,6 +4,7 @@
 {% set named_object = object_name in named_objects %}
 {% for resource in resources %}
 {% if resource.exported %}
+{% if "no-cross-site" not in resource.tags %}
 {% if "garb" not in resource.name %}
 define {{object_name}} {
     {% if named_object %}
@@ -26,6 +27,7 @@ define {{object_name}} {
     {% endif %}
     {% endfor %}
 }
+{% endif %}
 {% endif %}
 {% endif %}
 {% endfor %}
