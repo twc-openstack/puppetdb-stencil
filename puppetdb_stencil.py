@@ -24,7 +24,7 @@ ENVIRONMENT = jinja2.Environment(trim_blocks=True, lstrip_blocks=True,
                                  loader=LOADER, extensions=EXTENSIONS)
 
 
-def render_resources(database, resource_type, template_names):
+def render_resources(database, resource_type, localsite, template_names):
     """
     Render resources of the given type. They are queried from the given
     database and rendered using the first template from template_names that can
@@ -38,7 +38,7 @@ def render_resources(database, resource_type, template_names):
     else:
         return template.render(resource_type=resource_type,
                                resources=resources, metaparams=METAPARAMS,
-                               env=os.environ)
+                               env=os.environ, localsite=localsite)
 
 
 def main():
@@ -51,6 +51,7 @@ def main():
     parser.add_argument('--debug', '-d', action='store_true')
     parser.add_argument('--host', '-H', default='localhost')
     parser.add_argument('--port', '-p', default='8080')
+    parser.add_argument('--localsite', '-l', default='true')
 
     args = parser.parse_args()
     logging.basicConfig(level=logging.DEBUG if args.debug else logging.WARN)
@@ -61,7 +62,7 @@ def main():
         templates = ['{0}.jinja2'.format(resource_type)]
         if args.templates:
             templates += args.templates
-        print(render_resources(database, resource_type, templates))
+        print(render_resources(database, resource_type, args.localsite, templates))
 
 
 if __name__ == '__main__':
