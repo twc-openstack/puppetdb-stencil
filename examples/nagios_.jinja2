@@ -24,7 +24,7 @@ define {{ object_name }} {
     {% set nameparts = name.split('_') %}
     {% if nameparts[0]|lower == object_name %}
     {% if name not in envs_to_ignore %}
-    {{ name }} {{ env[name] }}
+    {{ ("_".join(nameparts[1:]))|lower }} {{ env[name]|lower }}
     {% endif %}
     {% endif %}
     {% endfor %}
