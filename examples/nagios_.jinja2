@@ -2,6 +2,7 @@
 {% set named_objects = ('host', 'hostgroup', 'servicegroup', 'contact', 'contactgroup', 'timeperiod', 'command') %}
 {% set object_name = resource_type[7:] %}
 {% set named_object = object_name in named_objects %}
+{% set service_dependencies = {} %}
 {% for resource in resources %}
 {% set envs_to_ignore = [] %}
 {% if resource.exported %}
@@ -29,6 +30,12 @@ define {{ object_name }} {
     {% endif %}
     {% endfor %}
 }
+{% for tag in resource.tags %}
+{% if 'parent:' in tag %}
+{% set parent_service_description = ':'.split(tag) %}
+# {{ parent_service_description }}
+{% endif %}
+{% endfor %}
 {% endif %}
 {% endif %}
 {% endfor %}
