@@ -86,10 +86,10 @@ def render_resources(database, resource_type, localsite, template_names):
                                     dto = {}
                                     dto['object_name'] = 'servicedependency'
                                     dto['parameters'] = [{
-                                        'host_name': parent.parameters['host_name'],
-                                        'service_description': parent.parameters['service_description'],
-                                        'dependent_host_name': child.parameters['host_name'],
-                                        'dependent_service_description': child.parameters['service_description']
+                                        'host_name': child.parameters['host_name'],
+                                        'service_description': child.parameters['service_description'],
+                                        'dependent_host_name': parent.parameters['host_name'],
+                                        'dependent_service_description': parent.parameters['service_description']
                                     }]
                                     icinga_config += template.render(dto=dto) + '\n'
         return icinga_config
