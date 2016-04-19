@@ -25,10 +25,11 @@ ENVIRONMENT = jinja2.Environment(trim_blocks=True, lstrip_blocks=True, loader=LO
 
 
 def is_resource_visible(resource, localsite):
-    return resource.exported and
-        (('only-cross-site' not in resource.tags and 'no-cross-site' not in resource.tags) or
+    return resource.exported and (
+        ('only-cross-site' not in resource.tags and 'no-cross-site' not in resource.tags) or
         ('only-cross-site' in resource.tags and 'no-cross-site' not in resource.tags and localsite == 'false') or
-        ('only-cross-site' not in resource.tags and 'no-cross-site' in resource.tags and localsite == 'true'))
+        ('only-cross-site' not in resource.tags and 'no-cross-site' in resource.tags and localsite == 'true')
+    )
 
 
 def render_resources(database, resource_type, localsite, template_names):
@@ -70,7 +71,7 @@ def render_resources(database, resource_type, localsite, template_names):
                     nameparts = name.split('_')
                     if nameparts[0].lower() == object_name and name not in envs_to_ignore:
                         dto['parameters'].append({'_'.join(nameparts[1:]).lower(): os.environ[name].lower()})
-                icinga_config += template.render(dto=dto) + '\n'
+                icinga_config += template.render(dto=dto)
             # collect child service dependencies under parent service_description
             for tag in resource.tags:
                 if 'parent:' in tag:
@@ -86,7 +87,7 @@ def render_resources(database, resource_type, localsite, template_names):
                 parent_service_description = item.replace('_', ' ')
                 # lookup parent resource by its service_description
                 for parent in resources:
-                    if is_resource_visible(resource, localsite):
+                    if is_resource_visible(parent, localsite):
                         for key, value in parent.parameters.items():
                             if key == 'service_description' and parent_service_description in value.lower():
                                 for child in service_dependencies[item]:
@@ -98,7 +99,7 @@ def render_resources(database, resource_type, localsite, template_names):
                                         'dependent_host_name': child.parameters['host_name'],
                                         'dependent_service_description': child.parameters['service_description']
                                     }]
-                                    icinga_config += template.render(dto=dto) + '\n'
+                                    icinga_config += template.render(dto=dto)
         return icinga_config
 
 
