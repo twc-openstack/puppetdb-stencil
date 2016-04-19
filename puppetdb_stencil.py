@@ -24,6 +24,13 @@ EXTENSIONS = ['jinja2.ext.with_', 'jinja2.ext.loopcontrols']
 ENVIRONMENT = jinja2.Environment(trim_blocks=True, lstrip_blocks=True, loader=LOADER, extensions=EXTENSIONS)
 
 
+def is_resource_visible(resource, localsite):
+    return resource.exported and
+        (('only-cross-site' not in resource.tags and 'no-cross-site' not in resource.tags) or
+        ('only-cross-site' in resource.tags and 'no-cross-site' not in resource.tags and localsite == 'false') or
+        ('only-cross-site' not in resource.tags and 'no-cross-site' in resource.tags and localsite == 'true'))
+
+
 def render_resources(database, resource_type, localsite, template_names):
     """
     Render resources of the given type. They are queried from the given
@@ -45,7 +52,7 @@ def render_resources(database, resource_type, localsite, template_names):
         for resource in r:
             resources.append(resource)
             envs_to_ignore = []
-            if resource.exported and ('only-cross-site' not in resource.tags or localsite == 'false'):
+            if is_resource_visible(resource, localsite):
                 dto = {}
                 dto['object_name'] = object_name
                 dto['named_object'] = named_object
@@ -79,7 +86,7 @@ def render_resources(database, resource_type, localsite, template_names):
                 parent_service_description = item.replace('_', ' ')
                 # lookup parent resource by its service_description
                 for parent in resources:
-                    if parent.exported and ('only-cross-site' not in parent.tags or localsite == 'false'):
+                    if is_resource_visible(resource, localsite):
                         for key, value in parent.parameters.items():
                             if key == 'service_description' and parent_service_description in value.lower():
                                 for child in service_dependencies[item]:
