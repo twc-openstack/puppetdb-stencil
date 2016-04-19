@@ -54,11 +54,12 @@ def render_resources(database, resource_type, localsite, template_names):
             resources.append(resource)
             envs_to_ignore = []
             if is_resource_visible(resource, localsite):
-                dto = {}
-                dto['object_name'] = object_name
-                dto['named_object'] = named_object
-                dto['name'] = resource.name
-                dto['parameters'] = []
+                dto = {
+                    'object_name': object_name,
+                    'named_object': named_object,
+                    'name': resource.name,
+                    'parameters': []
+                }
                 # capture resource parameters from puppet
                 for key, value in resource.parameters.items():
                     if (key not in METAPARAMS or key in ALLOWED_METAPARAMS) and (isinstance(value, list)):
@@ -91,14 +92,17 @@ def render_resources(database, resource_type, localsite, template_names):
                         for key, value in parent.parameters.items():
                             if key == 'service_description' and parent_service_description in value.lower():
                                 for child in service_dependencies[item]:
-                                    dto = {}
-                                    dto['object_name'] = 'servicedependency'
-                                    dto['parameters'] = [{
-                                        'host_name': parent.parameters['host_name'],
-                                        'service_description': parent.parameters['service_description'],
-                                        'dependent_host_name': child.parameters['host_name'],
-                                        'dependent_service_description': child.parameters['service_description']
-                                    }]
+                                    dto = {
+                                        'object_name': 'servicedependency',
+                                        'parameters': [{
+                                            'host_name': parent.parameters['host_name'],
+                                            'service_description': parent.parameters['service_description'],
+                                            'dependent_host_name': child.parameters['host_name'],
+                                            'dependent_service_description': child.parameters['service_description'],
+                                            'notification_failure_criteria': 'w,c,u,p',
+                                            'execution_failure_criteria': 'w,c,u,p'
+                                        }]
+                                    }
                                     icinga_config += template.render(dto=dto)
         return icinga_config
 
