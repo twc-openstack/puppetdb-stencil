@@ -72,7 +72,7 @@ def render_resources(database, resource_type, localsite, template_names):
                     nameparts = name.split('_')
                     if nameparts[0].lower() == object_name and name not in envs_to_ignore:
                         dto['parameters'].append({'_'.join(nameparts[1:]).lower(): os.environ[name].lower()})
-                icinga_config += template.render(dto=dto)
+                icinga_config += template.render(dto=dto) + '\n'
             # collect child service dependencies under parent service_description
             for tag in resource.tags:
                 if 'parent:' in tag:
@@ -103,7 +103,7 @@ def render_resources(database, resource_type, localsite, template_names):
                                             'execution_failure_criteria': 'w,c,u,p'
                                         }]
                                     }
-                                    icinga_config += template.render(dto=dto)
+                                    icinga_config += template.render(dto=dto) + '\n'
         return icinga_config
 
 
