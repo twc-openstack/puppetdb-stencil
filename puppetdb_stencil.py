@@ -62,11 +62,17 @@ def render_resources(database, resource_type, localsite, template_names):
                 }
                 # capture resource parameters from puppet
                 for key, value in resource.parameters.items():
-                    if (key not in METAPARAMS or key in ALLOWED_METAPARAMS) and (isinstance(value, list)):
-                        dto['parameters'].append({key: ','.join(value)})
-                    else:
-                        dto['parameters'].append({key: value})
-                    envs_to_ignore.append((object_name + '_' + key).upper())
+                    if key not in METAPARAMS or key in ALLOWED_METAPARAMS:
+                        if isinstance(value, list):
+                            dto['parameters'].append({key: ','.join(value)})
+                            envs_to_ignore.append((object_name + '_' + key).upper())
+                        # CIRRUS-4549: a value of 2 is the signal to
+                        # take the environment variable default. A
+                        # value of 0 or 1 should be used as-is from
+                        # puppet.
+                        elif not (key == 'notifications_enabled' and str(value) == '2'):
+                            dto['parameters'].append({key: value})
+                            envs_to_ignore.append((object_name + '_' + key).upper())
                 # capture environment variable defaults
                 for name in os.environ:
                     nameparts = name.split('_')
